@@ -49,6 +49,7 @@ RUN ./download_agent.sh $TARGETARCH /azp && \
 COPY ./start.sh ./
 RUN chmod +x ./start.sh && \
     useradd agent && \
+    echo "agent ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/agent && \
     chown agent ./ -R
 
 USER agent
