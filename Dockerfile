@@ -13,6 +13,9 @@ ENV TARGETARCH=linux-x64 \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
+    sudo \
+    curl \
+    jq \
     curl \
     git \
     libicu74 && \
