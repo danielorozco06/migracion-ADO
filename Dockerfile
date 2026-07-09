@@ -46,6 +46,7 @@ RUN apt-get update && \
     rm -rf /usr/share/bash-completion && \
     rm -rf /usr/share/zsh && \
     find /usr/share -type d -name "locale" -exec rm -rf {} + 2>/dev/null || true && \
+    # Show installed versions for verification
     python --version && \
     docker --version
 
