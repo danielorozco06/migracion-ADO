@@ -9,16 +9,19 @@ FROM public.ecr.aws/ubuntu/ubuntu:24.04
 ENV TARGETARCH=linux-x64 \
     DEBIAN_FRONTEND=noninteractive
 
-# Install only essential runtime dependencies
+# Install only essential runtime dependencies (+ system Python)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
     sudo \
     curl \
     jq \
-    curl \
     git \
-    libicu74 && \
+    libicu74 \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python-is-python3 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     # Remove unnecessary packages and files to reduce size
@@ -27,7 +30,8 @@ RUN apt-get update && \
     rm -rf /usr/share/perl* && \
     rm -rf /usr/share/bash-completion && \
     rm -rf /usr/share/zsh && \
-    find /usr/share -type d -name "locale" -exec rm -rf {} + 2>/dev/null || true
+    find /usr/share -type d -name "locale" -exec rm -rf {} + 2>/dev/null || true && \
+    python --version
 
 WORKDIR /azp/
 

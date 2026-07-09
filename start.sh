@@ -50,12 +50,14 @@ export VSO_AGENT_IGNORE=AZP_TOKEN,AZP_TOKEN_FILE
 
 # Setup agent environment
 if [ -z "$AZP_WORK" ]; then
-  export AZP_WORK="_work"
+  export AZP_WORK="/azp/_work"
+elif [[ "$AZP_WORK" != /* ]]; then
+  export AZP_WORK="/azp/$AZP_WORK"
 fi
 mkdir -p "$AZP_WORK"
 
 export AGENT_DOWNLOADSDIR="$AZP_WORK/_downloads"
-export AGENT_TOOLSDIRECTORY="$AZP_WORK/_tools"
+export AGENT_TOOLSDIRECTORY="$AZP_WORK/_tool"
 mkdir -p "$AGENT_DOWNLOADSDIR"
 mkdir -p "$AGENT_TOOLSDIRECTORY"
 
