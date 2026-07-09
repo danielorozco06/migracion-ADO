@@ -9,19 +9,34 @@ FROM public.ecr.aws/ubuntu/ubuntu:24.04
 ENV TARGETARCH=linux-x64 \
     DEBIAN_FRONTEND=noninteractive
 
-# Install only essential runtime dependencies (+ system Python)
+# Install essential runtime deps, system Python, and Docker CLI.
+# No dockerd inside the container: agents use the host Docker Engine via
+# the bind-mounted /var/run/docker.sock (Docker Swarm on the EC2 host).
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
     sudo \
     curl \
+    gnupg \
     jq \
     git \
     libicu74 \
+    # Install Python 3 and related packages
     python3 \
     python3-pip \
     python3-venv \
     python-is-python3 && \
+    # Install Docker CLI and related plugins
+    install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    chmod a+r /etc/apt/keyrings/docker.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" \
+      > /etc/apt/sources.list.d/docker.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    docker-ce-cli \
+    docker-buildx-plugin \
+    docker-compose-plugin && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     # Remove unnecessary packages and files to reduce size
@@ -31,7 +46,8 @@ RUN apt-get update && \
     rm -rf /usr/share/bash-completion && \
     rm -rf /usr/share/zsh && \
     find /usr/share -type d -name "locale" -exec rm -rf {} + 2>/dev/null || true && \
-    python --version
+    python --version && \
+    docker --version
 
 WORKDIR /azp/
 

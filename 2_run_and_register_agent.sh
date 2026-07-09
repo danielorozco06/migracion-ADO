@@ -136,6 +136,18 @@ cleanup_existing_service() {
 create_service() {
   print_header "Creating Azure DevOps agent Swarm service"
 
+  # Share host Docker Engine with agents (CLI in container → host dockerd).
+  # --group grants access to docker.sock (Swarm uses --group, not --group-add).
+  local group_args=()
+  if [ -S /var/run/docker.sock ]; then
+    local docker_gid
+    docker_gid=$(stat -c '%g' /var/run/docker.sock)
+    group_args=(--group "$docker_gid")
+    print_success "docker.sock group access (GID $docker_gid)"
+  else
+    print_warning "/var/run/docker.sock not found on host"
+  fi
+
   docker service create \
     --detach \
     --name "$SERVICE_NAME" \
@@ -146,6 +158,7 @@ create_service() {
     -e AZP_TOKEN="$AZP_TOKEN" \
     -e AZP_POOL="$AZP_POOL" \
     --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
+    "${group_args[@]}" \
     "$IMAGE"
 
   print_success "Service '$SERVICE_NAME' created with $REPLICAS replicas"
