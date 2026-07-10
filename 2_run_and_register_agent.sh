@@ -74,18 +74,6 @@ set_defaults() {
   print_success "Using replicas: $REPLICAS"
 }
 
-# Check if image exists
-check_image() {
-  print_header "Checking Docker image"
-
-  if ! docker images | grep -q "$IMAGE"; then
-    print_warning "Image $IMAGE not found. Building..."
-    bash build_docker_file.sh
-  else
-    print_success "Image $IMAGE found"
-  fi
-}
-
 # Ensure Docker Swarm is active on this node
 ensure_swarm() {
   print_header "Checking Docker Swarm"
@@ -207,7 +195,6 @@ main() {
 
   validate_env
   set_defaults
-  check_image
   ensure_swarm
   cleanup_existing_service
   create_service
