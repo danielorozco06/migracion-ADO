@@ -26,7 +26,7 @@ echo "Working directory: $WORKDIR"
 
 # Use fixed agent version to reduce network calls
 # Check on https://github.com/microsoft/azure-pipelines-agent/releases for latest version updates
-AGENT_VERSION="4.274.1"
+AGENT_VERSION="4.275.0"
 
 echo "Using fixed agent version: $AGENT_VERSION"
 
